@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Letter Party</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<button id="theme-toggle" class="theme-switch" type="button" aria-label="Toggle light/dark theme" title="Toggle light/dark theme">
+  <span class="theme-knob"></span>
+  <span class="theme-icon moon">🌙</span>
+  <span class="theme-icon sun">☀</span>
+</button>
+<button id="lang-toggle" class="lang-switch" type="button" aria-label="Toggle English / Arabic" title="English / العربية">
+  <span class="lang-knob"></span>
+  <span class="lang-label en">EN</span>
+  <span class="lang-label ar">ع</span>
+</button>
+<div id="app">
+
+  <section id="home-screen" class="screen active">
+    <h1 data-i18n-html="title_html">Letter <span class="accent">Party</span></h1>
+    <p class="tagline" data-i18n="tagline">Name · Animal · Thing · Country · Food · Fiction</p>
+    <div class="card">
+      <label for="player-name" data-i18n="your_name">Your Name</label>
+      <input id="player-name" maxlength="20" placeholder="e.g. Alex" autocomplete="off">
+
+      <button id="create-btn" class="primary" data-i18n="create_party">Create Party</button>
+
+      <div class="divider"><span data-i18n="or_join">or join one</span></div>
+
+      <label for="room-code-input" data-i18n="room_code_label">Room Code</label>
+      <input id="room-code-input" maxlength="6" placeholder="ABC123" autocomplete="off" class="roomcode-input">
+      <button id="join-btn" class="secondary" data-i18n="join_party">Join Party</button>
+    </div>
+    <p id="home-status" class="status"></p>
+  </section>
+
+  <section id="lobby-screen" class="screen">
+    <h2 data-i18n="lobby">Lobby</h2>
+    <div class="card">
+      <div class="room-code-display">
+        <div>
+          <span class="muted" data-i18n="room_code_label">Room Code</span>
+          <code id="room-code-display">------</code>
+        </div>
+        <button id="copy-code" class="small" data-i18n="copy">Copy</button>
+      </div>
+
+      <h3 data-i18n="players">Players</h3>
+      <ul id="player-list" class="player-list"></ul>
+
+      <h3 data-i18n="categories">Categories</h3>
+      <div id="category-chips" class="category-chips"></div>
+      <div id="category-add-row" class="category-add-row">
+        <input id="new-category-input" placeholder="Add custom category" data-i18n-placeholder="add_custom_placeholder" maxlength="20" autocomplete="off">
+        <button id="add-category-btn" type="button" class="small" data-i18n="add">Add</button>
+      </div>
+      <p id="category-hint" class="muted small-text" data-i18n="host_change_cats">Only the host can change categories.</p>
+
+      <p id="lobby-hint" class="muted small-text"></p>
+      <button id="start-game-btn" class="primary" disabled data-i18n="start_game">Start Game</button>
+      <button id="leave-lobby-btn" class="link-btn" data-i18n="leave">Leave</button>
+      <p id="lobby-status" class="status"></p>
+    </div>
+  </section>
+
+  <section id="game-screen" class="screen">
+    <div class="round-header">
+      <div class="round-info"><span data-i18n="round">Round</span> <span id="round-number">1</span></div>
+      <div class="letter-display" id="letter-display">A</div>
+      <div class="finish-status" id="finish-status" data-i18n="write_prompt">Write words starting with this letter!</div>
+    </div>
+
+    <div class="sheet-wrap">
+      <div class="sheet" id="sheet">
+        <div class="sheet-row header-row" id="header-row">
+          <div class="col-letter" data-i18n="letter_col">Letter</div>
+          <div class="col-pts" data-i18n="pts_col">Pts</div>
+        </div>
+
+        <div id="history-rows"></div>
+
+        <form id="answers-form" autocomplete="off">
+          <div class="sheet-row current-row" id="current-row">
+            <div class="col-letter letter-cell" id="current-letter-cell">—</div>
+            <div class="col-pts pts-cell" id="current-pts-cell">—</div>
+          </div>
+          <button type="submit" id="done-btn" class="primary big" data-i18n="done">Done!</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="results-screen" class="screen">
+    <h2><span data-i18n="round_results_prefix">Round Results — Letter</span> <span id="results-letter" class="accent"></span></h2>
+    <div class="results-wrap">
+      <table id="results-table">
+        <thead><tr id="results-head"></tr></thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+
+    <h3 data-i18n="scoreboard">Scoreboard</h3>
+    <ol id="scoreboard" class="scoreboard"></ol>
+
+    <div class="button-row">
+      <button id="next-round-btn" class="primary" data-i18n="next_letter">Next Letter</button>
+      <button id="end-game-btn" class="secondary" data-i18n="end_game">End Game</button>
+    </div>
+    <p id="results-status" class="status"></p>
+  </section>
+
+  <section id="final-screen" class="screen">
+    <h2 data-i18n="game_over">Game Over</h2>
+    <div class="winner-banner" id="winner-banner"></div>
+    <ol id="final-scoreboard" class="scoreboard"></ol>
+    <button id="play-again-btn" class="primary" data-i18n="back_home">Back to Home</button>
+  </section>
+
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
