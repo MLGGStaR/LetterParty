@@ -117,6 +117,11 @@ html, body {
   transition: background .2s, border-color .2s;
 }
 .lang-switch:hover { border-color: var(--primary); }
+.lang-switch:disabled, .lang-switch.locked {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.lang-switch:disabled:hover, .lang-switch.locked:hover { border-color: var(--border); }
 .lang-switch .lang-knob {
   position: absolute;
   top: 5px;
@@ -464,6 +469,11 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 }
 .cell input:disabled { color: var(--muted); cursor: default; }
 
+/* Inline category label rendered inside each input/history cell.
+   Hidden on desktop (we show column headers above instead); shown on mobile's stacked layout. */
+.cell-label { display: none; }
+.cell-value { flex: 1; }
+
 /* Current (active) row accent */
 .current-row .letter-cell {
   background: rgba(var(--accent-rgb), 0.14);
@@ -730,13 +740,81 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   .round-info { font-size: 12px; }
   .finish-status { font-size: 13px; }
 
-  .sheet-row { grid-template-columns: 38px repeat(var(--cat-count, 6), minmax(0, 1fr)) 48px; gap: 4px; margin-bottom: 4px; }
-  .sheet-row > * { padding: 9px 6px; font-size: 13px; border-radius: 8px; }
-  .cell input { padding: 9px 6px; font-size: 13px; }
-  .letter-cell { font-size: 17px; }
-  .pts-cell { font-size: 14px; }
-  .header-row > * { padding: 2px 2px 3px; font-size: 10px; letter-spacing: .08em; }
-  .history-row .cell-static { padding: 9px 6px; }
+  /* On mobile, flip the sheet from a cramped horizontal grid into a stacked
+     card per round: letter pill on top, each category on its own full-width
+     line with an inline label, points pill at the bottom. */
+  .header-row { display: none; }
+
+  .sheet-row {
+    display: block;
+    padding: 0 0 10px;
+    margin-bottom: 18px;
+    gap: 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .sheet-row:last-child { border-bottom: none; }
+
+  .sheet-row > .col-letter,
+  .sheet-row > .col-pts {
+    display: inline-flex;
+    width: auto;
+    min-width: 72px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 18px;
+    margin: 0 0 10px;
+    justify-content: center;
+    font-weight: 800;
+  }
+  .sheet-row > .col-letter {
+    background: rgba(var(--accent-rgb), 0.14);
+    border-color: rgba(var(--accent-rgb), 0.55);
+    color: var(--accent);
+    font-size: 22px;
+  }
+  .sheet-row > .col-pts {
+    margin-top: 6px;
+    color: var(--accent);
+  }
+
+  .sheet-row > .col-cat {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 8px;
+    min-height: 50px;
+  }
+  .sheet-row > .col-cat.cell { padding: 0; }
+  .history-row > .col-cat.cell-static { padding: 12px 14px; }
+
+  .cell-label {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 88px;
+    padding: 0 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .cell input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 14px 14px;
+    font-size: 16px;
+  }
+  .cell-value {
+    flex: 1;
+    font-size: 16px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   #answers-form > button { padding: 14px; font-size: 16px; margin-top: 12px; }
 
@@ -771,10 +849,10 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 }
 
 @media (max-width: 400px) {
-  .sheet-row { grid-template-columns: 32px repeat(var(--cat-count, 6), minmax(0, 1fr)) 40px; gap: 3px; }
-  .sheet-row > * { padding: 7px 4px; font-size: 12px; }
-  .cell input { padding: 7px 4px; font-size: 12px; }
-  .letter-cell { font-size: 15px; }
-  .header-row > * { font-size: 9px; padding: 2px 1px 3px; }
   .letter-display { font-size: 56px; }
+  .cell-label { min-width: 76px; padding: 0 10px; font-size: 11px; }
+  .cell input { padding: 12px 10px; font-size: 15px; }
+  .cell-value { font-size: 15px; }
+  .sheet-row > .col-letter { font-size: 20px; padding: 9px 16px; }
+  .sheet-row > .col-pts { font-size: 16px; padding: 8px 14px; }
 }

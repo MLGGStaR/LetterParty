@@ -269,6 +269,7 @@ function createParty() {
     setStatus('lobby-status', '', false);
     $('lobby-hint').textContent = t('share_hint');
     $('start-game-btn').disabled = false;
+    updateLangToggleLocked();
   });
 
   state.peer.on('connection', conn => {
@@ -323,6 +324,7 @@ function joinParty() {
       $('lobby-hint').textContent = t('waiting_start');
       $('start-game-btn').style.display = 'none';
       setStatus('lobby-status', '', false);
+      updateLangToggleLocked();
     });
     conn.on('data', data => handleGuestMessage(data));
     conn.on('close', () => {
@@ -405,12 +407,13 @@ function handleHostMessage(conn, data) {
     }
     broadcastPlayers();
     renderLobby();
-    // Send current categories to the new joiner so their lobby reflects host's setup
+    // Send current categories and language to the new joiner
     if (conn && conn.open) {
       conn.send({
         type: 'categories_update',
         categories: state.categories.map(c => ({ id: c.id, label: c.label })),
       });
+      conn.send({ type: 'language_update', language: state.language });
     }
     return;
   }
@@ -587,6 +590,18 @@ function handleGuestMessage(data) {
     return;
   }
 
+  if (data.type === 'language_update') {
+    const nextLang = (data.language === 'ar') ? 'ar' : 'en';
+    if (nextLang !== state.language) {
+      const oldLang = state.language;
+      state.language = nextLang;
+      maybeSwapDefaultCategories(oldLang);
+      applyLanguage();
+    }
+    updateLangToggleLocked();
+    return;
+  }
+
   if (data.type === 'round_start') {
     state.currentLetter = data.letter;
     state.round = data.round;
@@ -637,6 +652,7 @@ function handleGuestMessage(data) {
 async function enterRound(letter, round) {
   showScreen('game-screen');
   $('round-number').textContent = round;
+  updateLangToggleLocked();
   renderSheet();
   $('current-letter-cell').textContent = '?';
   $('current-pts-cell').textContent = '—';
@@ -722,12 +738,20 @@ function renderHistory() {
     letterCell.textContent = entry.letter;
     row.appendChild(letterCell);
 
-    for (const cat of state.categories.map(c => c.id)) {
+    for (const catObj of state.categories) {
+      const cat = catObj.id;
       const cell = document.createElement('div');
       const tag = entry.tags[cat] || 'blank';
       cell.className = 'col-cat cell-static ans-' + tag;
       const raw = (entry.answers[cat] || '').trim();
-      cell.textContent = raw || '—';
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'cell-label';
+      labelSpan.textContent = catObj.label;
+      cell.appendChild(labelSpan);
+      const valSpan = document.createElement('span');
+      valSpan.className = 'cell-value';
+      valSpan.textContent = raw || '—';
+      cell.appendChild(valSpan);
       row.appendChild(cell);
     }
 
@@ -1043,6 +1067,10 @@ function renderSheet() {
 
     const lbl = document.createElement('label');
     lbl.className = 'col-cat cell';
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'cell-label';
+    labelSpan.textContent = cat.label;
+    lbl.appendChild(labelSpan);
     const input = document.createElement('input');
     input.name = cat.id;
     input.autocomplete = 'off';
@@ -1161,21 +1189,51 @@ function maybeSwapDefaultCategories(oldLang) {
   }
 }
 
-// Language toggle (EN/AR) with localStorage persistence
+// Language toggle (EN/AR). In a party, only the host can change it, and
+// it becomes locked once the first round begins.
 (function wireLangToggle() {
   const btn = document.getElementById('lang-toggle');
   if (!btn) return;
   const KEY = 'letterparty-lang';
-  // Apply whatever state.language was seeded with on load
   applyLanguage();
+  updateLangToggleLocked();
   btn.addEventListener('click', () => {
+    if (isLangLocked()) return;
     const oldLang = state.language;
     state.language = state.language === 'ar' ? 'en' : 'ar';
-    try { localStorage.setItem(KEY, state.language); } catch {}
+    // Persist only as a home-screen preference; in a party the party's choice is authoritative
+    if (!state.roomCode) {
+      try { localStorage.setItem(KEY, state.language); } catch {}
+    }
     maybeSwapDefaultCategories(oldLang);
     applyLanguage();
+    if (state.isHost) broadcastLanguage();
   });
 })();
+
+function isLangLocked() {
+  const gameStarted = state.round > 0 || state.myHistory.length > 0;
+  const guestInParty = !!state.roomCode && !state.isHost;
+  return gameStarted || guestInParty;
+}
+
+function updateLangToggleLocked() {
+  const btn = document.getElementById('lang-toggle');
+  if (!btn) return;
+  const locked = isLangLocked();
+  btn.disabled = locked;
+  btn.classList.toggle('locked', locked);
+  btn.title = locked
+    ? (state.round > 0 || state.myHistory.length > 0
+        ? 'Locked once the game has started'
+        : 'Only the host can change the language')
+    : 'English / العربية';
+}
+
+function broadcastLanguage() {
+  if (!state.isHost) return;
+  broadcast({ type: 'language_update', language: state.language });
+}
 
 // Theme toggle (light/dark) with localStorage persistence
 (function wireThemeToggle() {
@@ -1246,4 +1304,5 @@ function fullReset() {
   $('start-game-btn').style.display = '';
   setStatus('home-status', '', false);
   showScreen('home-screen');
+  updateLangToggleLocked();
 }
