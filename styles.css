@@ -740,81 +740,81 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   .round-info { font-size: 12px; }
   .finish-status { font-size: 13px; }
 
-  /* On mobile, flip the sheet from a cramped horizontal grid into a stacked
-     card per round: letter pill on top, each category on its own full-width
-     line with an inline label, points pill at the bottom. */
-  .header-row { display: none; }
+  /* On mobile, keep the horizontal grid feel but wrap into 2 rows of 3
+     cells so each input is ~3× wider and the typed text is readable. */
+  .header-row { display: none !important; }
 
   .sheet-row {
-    display: block;
-    padding: 0 0 10px;
-    margin-bottom: 18px;
-    gap: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    padding: 0 0 12px;
+    margin-bottom: 14px;
     border-bottom: 1px dashed var(--border);
   }
   .sheet-row:last-child { border-bottom: none; }
 
   .sheet-row > .col-letter,
   .sheet-row > .col-pts {
-    display: inline-flex;
-    width: auto;
-    min-width: 72px;
-    padding: 10px 20px;
-    border-radius: 999px;
-    font-size: 18px;
-    margin: 0 0 10px;
+    grid-column: 1 / -1;
     justify-content: center;
+    border-radius: 999px;
+    padding: 10px 20px;
     font-weight: 800;
   }
   .sheet-row > .col-letter {
+    font-size: 22px;
     background: rgba(var(--accent-rgb), 0.14);
     border-color: rgba(var(--accent-rgb), 0.55);
     color: var(--accent);
-    font-size: 22px;
   }
   .sheet-row > .col-pts {
-    margin-top: 6px;
+    font-size: 18px;
     color: var(--accent);
   }
 
   .sheet-row > .col-cat {
     display: flex;
-    align-items: center;
-    width: 100%;
+    flex-direction: column;
     padding: 0;
-    margin-bottom: 8px;
-    min-height: 50px;
+    min-width: 0;
+    align-items: stretch;
   }
   .sheet-row > .col-cat.cell { padding: 0; }
-  .history-row > .col-cat.cell-static { padding: 12px 14px; }
+  .history-row > .col-cat.cell-static { padding: 8px 8px 10px; }
 
   .cell-label {
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-    min-width: 88px;
-    padding: 0 14px;
-    font-size: 12px;
+    display: block;
+    padding: 8px 8px 2px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: .06em;
+    letter-spacing: .05em;
     text-transform: uppercase;
     color: var(--muted);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .cell input {
     flex: 1;
     width: 100%;
     min-width: 0;
-    padding: 14px 14px;
-    font-size: 16px;
+    padding: 6px 10px 10px;
+    font-size: 15px;
+    text-align: center;
   }
   .cell-value {
     flex: 1;
-    font-size: 16px;
-    min-width: 0;
+    font-size: 15px;
+    padding: 2px 0 0;
+    text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
+  .history-row .cell-static .cell-label { padding: 0; }
 
   #answers-form > button { padding: 14px; font-size: 16px; margin-top: 12px; }
 
@@ -848,11 +848,12 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   .winner-banner .trophy { font-size: 40px; }
 }
 
-@media (max-width: 400px) {
-  .letter-display { font-size: 56px; }
-  .cell-label { min-width: 76px; padding: 0 10px; font-size: 11px; }
-  .cell input { padding: 12px 10px; font-size: 15px; }
-  .cell-value { font-size: 15px; }
-  .sheet-row > .col-letter { font-size: 20px; padding: 9px 16px; }
+@media (max-width: 420px) {
+  .sheet-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .letter-display { font-size: 60px; }
+  .cell-label { font-size: 10px; padding: 8px 6px 2px; }
+  .cell input { padding: 6px 8px 10px; font-size: 16px; }
+  .cell-value { font-size: 16px; }
+  .sheet-row > .col-letter { font-size: 20px; padding: 8px 16px; }
   .sheet-row > .col-pts { font-size: 16px; padding: 8px 14px; }
 }
