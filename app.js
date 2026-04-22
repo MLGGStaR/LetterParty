@@ -651,6 +651,7 @@ function handleGuestMessage(data) {
 // ============================================================
 async function enterRound(letter, round) {
   showScreen('game-screen');
+  window.scrollTo({ top: 0, behavior: 'auto' });
   $('round-number').textContent = round;
   updateLangToggleLocked();
   renderSheet();
