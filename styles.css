@@ -737,8 +737,9 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   #results-table th, #results-table td { padding: 12px 14px; font-size: 16px; }
   .scoreboard li { padding: 16px 18px; font-size: 17px; }
   .scoreboard li .points { font-size: 22px; }
-  .pts-value { font-size: 18px; min-width: 44px; }
-  .pts-btn { padding: 6px 11px; font-size: 14px; }
+  .pts-editor { gap: 8px; }
+  .pts-value { font-size: 19px; min-width: 44px; }
+  .pts-btn { padding: 10px 14px; font-size: 15px; min-height: 40px; }
 }
 
 @media (max-width: 640px) {
@@ -848,8 +849,28 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   .scoreboard li .delta { font-size: 13px; }
   .button-row { flex-direction: column; gap: 8px; }
   .button-row .primary, .button-row .secondary { padding: 14px; font-size: 15px; }
-  .pts-value { font-size: 15px; min-width: 36px; }
-  .pts-btn { padding: 5px 9px; font-size: 12px; }
+  /* Points editor on phones: value on top, tap-friendly +5/-5 buttons below */
+  .pts-editor {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+  }
+  .pts-value {
+    order: 1;
+    width: 100%;
+    text-align: center;
+    font-size: 19px;
+    min-width: 0;
+  }
+  .pts-btn {
+    order: 2;
+    padding: 12px 16px;
+    font-size: 16px;
+    min-width: 52px;
+    min-height: 44px;
+    border-radius: 8px;
+  }
 
   .card { padding: 18px; }
   input[type="text"], input:not([type]) { font-size: 15px; padding: 10px 12px; }
@@ -867,4 +888,6 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   .cell-value { font-size: 16px; }
   .sheet-row > .col-letter { font-size: 20px; padding: 8px 16px; }
   .sheet-row > .col-pts { font-size: 16px; padding: 8px 14px; }
+  /* Keep the phone +/-5 buttons tall but slightly narrower to fit the cell */
+  .pts-btn { padding: 11px 12px; min-width: 48px; font-size: 15px; }
 }
